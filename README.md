@@ -257,7 +257,7 @@ Please note that the base models are pretrained base models not instruction fine
 For running inference and measuring log-probability, we support vLLM offline batched inference.
 For more information, refer to vLLM documentation (https://docs.vllm.ai/en/latest/getting_started/quickstart.html).
 The following command takes a test file (generated in the 'Prepare Dataset' section)
-and a (fine-tuned) LLM as an input, and generates response distribution along with the Wasserstein distnace.
+and a (fine-tuned) LLM as an input, and generates response distribution along with the Wasserstein distance.
 
 ```bash
 python scripts/experiment/run_inference.py
