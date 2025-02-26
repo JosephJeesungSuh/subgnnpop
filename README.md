@@ -1,7 +1,7 @@
 # Language Model Fine-Tuning on Scaled Survey Data for Predicting Distributions of Public Opinions
 
 <!--- BADGES: START --->
-[![Arxiv](https://img.shields.io/badge/arXiv-2502.16761-B31B.svg)][#arxiv-paper-package]
+[![Arxiv](https://img.shields.io/badge/arXiv-2502.16761-B31B1B.svg)][#arxiv-paper-package]
 [![Github License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 
@@ -16,17 +16,9 @@
   <img src="figs/thumbnail.png" alt="Thumbnail" width="60%">
 </p>
 
-**TL;DR:**
-Large language models (LLMs) present novel opportunities in public opinion research
-by predicting survey responses in advance during the early stages of survey design.
-While prior methods steer LLMs via descriptions of subpopulations as LLMs' input prompt,
-they have struggled to faithfully predict the distribution of survey responses from human subjects.
-To solve this problem, we propose directly fine-tuning LLMs to predict response distributions of diverse subpopulations.
-To enable fine-tuning, we introduce SubPOP,
-a scaled dataset of 3,362 questions and 70K subpopulation-response pairs
-from two public opinion survey families across 22 subpopulations in the United States.
-Across a range of **questions from different survey waves, questions from different survey family, and subpopulations**,
-our fine-tuned model consistently demonstrated an **improved opinion distribution prediction** capability.
+**Can LLMs assist public opinion survey designs by predicting responses?**
+
+We fine-tune LLMs on our new large-scale survey response dataset, SubPOP, which reduces the distributional gap between human-LLM predictions by up to 46% 📊
 For more details, please check out our [paper](https://arxiv.org/abs/2502.16761).
 
 ---
@@ -38,8 +30,8 @@ To install the required packages, you can create a conda environment, clone, and
 conda create -n subpop python=3.10 -y
 conda activate subpop
 
-git clone git@github.com:CannyLab/SubPOP.git
-cd SubPOP
+git clone git@github.com:JosephJeesungSuh/subpop.git
+cd subpop
 pip install -r requirements.txt
 pip install -e .
 ```
@@ -287,7 +279,7 @@ For any questions or issues about the paper and implementation, please open an i
 
 ## Citation
 
-```bash
+```
 @misc{suh2025languagemodelfinetuningscaled,
       title={Language Model Fine-Tuning on Scaled Survey Data for Predicting Distributions of Public Opinions}, 
       author={Joseph Suh and Erfan Jahanparast and Suhong Moon and Minwoo Kang and Serina Chang},
