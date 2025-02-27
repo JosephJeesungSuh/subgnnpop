@@ -18,7 +18,7 @@
 
 **Can LLMs assist public opinion survey designs by predicting responses?**
 
-We fine-tune LLMs on our new large-scale survey response dataset, SubPOP, which reduces the distributional gap between human-LLM predictions by up to 46% 📊
+We fine-tune LLMs on our new large-scale survey response dataset, **SubPOP**, which reduces the distributional gap between human-LLM predictions by up to 46% 📊
 For more details, please check out our [paper](https://arxiv.org/abs/2502.16761).
 
 ---
@@ -280,13 +280,10 @@ For any questions or issues about the paper and implementation, please open an i
 ## Citation
 
 ```
-@misc{suh2025languagemodelfinetuningscaled,
-      title={Language Model Fine-Tuning on Scaled Survey Data for Predicting Distributions of Public Opinions}, 
-      author={Joseph Suh and Erfan Jahanparast and Suhong Moon and Minwoo Kang and Serina Chang},
-      year={2025},
-      eprint={2502.16761},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2502.16761}, 
+@article{suh2025language,
+  title={Language Model Fine-Tuning on Scaled Survey Data for Predicting Distributions of Public Opinions},
+  author={Suh, Joseph and Jahanparast, Erfan and Moon, Suhong and Kang, Minwoo and Chang, Serina},
+  journal={arXiv preprint arXiv:2502.16761},
+  year={2025}
 }
 ```
