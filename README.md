@@ -51,12 +51,12 @@ To reproduce the fine-tuning and evaluations in the paper, run the following thr
 
 ### Step 0. Download Dataset
 
-We offer two options for obtaining the datset:
+We offer two options for obtaining the dataset:
 
-**Option 1**. Download Preprocessed Subpopulation-level Response Distribution Data
+**Option 1**. Download Preprocessed Subpopulation-Level Response Distribution Data
 
 You can directly download the preprocessed SubPOP dataset from the [HuggingFace dataset repository](https://huggingface.co/datasets/jjssuh/subpop).
-This dataset includes two files: SubPoP-*Train* and SubPoP-*Eval* in a `.jsonl` format.
+This dataset includes two files: SubPOP-*Train* and SubPOP-*Eval* in a `.jsonl` format.
 Before downloading, you have to agree to the dataset's terms of use.
 After downloading these files, place them under `data/subpop-train/processed/` and `data/subpop-eval/processed/`, respectively.
 Then proceed directly to [Step 3: Generate Fine-Tuning Dataset](#step-3-generate-fine-tuning-dataset).
