@@ -49,24 +49,36 @@ To reproduce the fine-tuning and evaluations in the paper, run the following thr
 
 ## Prepare Dataset
 
-**Step 0. Download Dataset**
+### Step 0. Download Dataset
 
-For SubPOP, we do not provide a raw survey response data due to the terms of use.
-Instead, we direct you to download the survey response dataset from their webpages.
+We offer two options for obtaining the datset:
+
+**Option 1**. Download Preprocessed Subpopulation-level Response Distribution Data
+
+You can directly download the preprocessed SubPOP dataset from the [HuggingFace dataset repository](https://huggingface.co/datasets/jjssuh/subpop).
+This dataset includes two files: SubPoP-*Train* and SubPoP-*Eval* in a `.jsonl` format.
+Before downloading, you have to agree to the dataset's terms of use.
+After downloading these files, place them under `data/subpop-train/processed/` and `data/subpop-eval/processed/`, respectively.
+Then proceed directly to [Step 3: Generate Fine-Tuning Dataset](#step-3-generate-fine-tuning-dataset).
+
+**Option 2**. Curate Dataset from Raw Survey Responses
+
+For greater transparency and to facilitate further research involving raw survey data preprocessing, we provide a data curation pipeline.
+If you prefer to curate the dataset yourself, you'll first need to obtain the original survey response data:
 
 For SubPOP-*Train*, please visit American Trends Panel wave 61-132 
 from [Pew Research](https://www.pewresearch.org/american-trends-panel-datasets/)
-and place all .sav files (ex. 'ATP W132.sav') under the `data/subpop-train/` directory.
+and place all .sav files (ex. `ATP W132.sav`) under the `data/subpop-train/` directory.
 
 For SubPOP-*Eval*, please visit 2022 General Social Survey
 from [NORC](https://gss.norc.org/us/en/gss/get-the-data/stata.html)
-and place the .dta file ('GSS2022.dta') under `data/subpop-eval`.
+and place the .dta file (`GSS2022.dta`) under `data/subpop-eval`.
 
 For OpinionQA, the group-level survey response result is provided by
 [OpinionQA official repository](https://github.com/tatsu-lab/opinions_qa),
 and we adopt this survey dataset by locating it at `data/opinionqa/processed/opinionqa.csv`.
 
-**Step 1. Refine Question Text**
+### Step 1. Refine Question Text
 
 As a first step, you can refine the question text with the following command.
 Processed question text will be placed at `data/subpop-train/processed/refined_qkey_dict.json`.
@@ -80,7 +92,7 @@ For SubPOP-*Eval* we provide a refined version at `data/subpop-eval/processed/re
 For OpinionQA, we provide a refined version at `data/opinionqa/processed/refined_qkey_dict.json`
 which was developed by [OpinionQA](https://github.com/tatsu-lab/opinions_qa).
 
-**Step 2. Obtain Response Distribution**
+### Step 2. Obtain Response Distribution
 
 American Trends Panel and General Social Survey provide responses of anonymized individuals.
 You can obtain the response distribution per each subpopulation by aggregating individual responses
@@ -100,7 +112,7 @@ python scripts/data_generation/generate_distribution.py
 Running the script with a specified dataset name will result in 22 subpopulations response distribution
 located at `data/{DATASET_NAME}/processed/{DATASET_NAME}.csv`.
 
-**Step 3. Generate Fine-Tuning Dataset**
+### Step 3. Generate Fine-Tuning Dataset
 
 This step converts the response distribution data from the previous step into a ready-to-go fine-tuning dataset.
 You can run the following command:
