@@ -1,3 +1,4 @@
+outputs/
 ## SubPOP-train
 # raw data file from American Trends Panel
 data/subpop-train/*.sav
