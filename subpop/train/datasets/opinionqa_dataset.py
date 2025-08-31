@@ -5,15 +5,49 @@ import os
 import ast
 import json
 from multiprocessing import Lock
+import re
+from typing import List, Dict
 
 import datasets
 import pandas as pd
 
+def prompt_chat_formatter(prompt: str) -> List[Dict[str, str]]:
+    """
+    Reformat the QA steering prompt into the chat conversation.
+    QA prompt is in Question:-Ansewer: format. Convert to user-assistant.
+    """
+    messages = []
+    messages.append( # subpopulation steering question
+        {"role": "system", "content": "Respond to the following question by choosing one of the available options, and strictly answering with the option letter (e.g., 'A', 'B', etc.). Do not provide any additional text or explanation."}
+    )
+    prompt = prompt.strip()
+    parts = re.split(r'(Question:|Answer:)', prompt)
+    user_prompts =  [parts[0] + parts[1] + parts[2] + parts[3]]
+    assistant_prompts = []
+    for _idx in range(4, len(parts)-1, 4):
+        assistant_prompts.append(parts[_idx].strip())
+        user_prompts.append(parts[_idx+1] + parts[_idx+2] + parts[_idx+3])
+    assert len(user_prompts) == len(assistant_prompts) + 1
+    for idx in range(len(assistant_prompts)):
+        messages.append(
+            {"role": "user", "content": user_prompts[idx].strip()}
+        )
+        messages.append(
+            {"role": "assistant", "content": assistant_prompts[idx].strip()}
+        )
+    messages.append(
+        {"role": "user", "content": user_prompts[-1].strip()}
+    )
+    return messages
+
 def get_preprocessed_opinionqa_ce_or_wd_loss(
     dataset_config, tokenizer, split, chat_template, save = True,
 ):
+    
+    chat_template = True if chat_template.lower() == 'true' else False
+    print(f"--> is_chat_template: {chat_template}")
 
-    def tokenize_add_label(sample, chat_template=False):
+    def tokenize_add_label(sample):
 
         if not chat_template: # using pretrained base model
             prompt = tokenizer.encode(
@@ -25,8 +59,15 @@ def get_preprocessed_opinionqa_ce_or_wd_loss(
                 add_special_tokens=False
             )[-1]
         else:
-            print("Something is wrong!!!!!!!!!!!!!!!!!!")
-            raise NotImplementedError()
+            messages = prompt_chat_formatter(sample["prompt"])
+            prompt = tokenizer.apply_chat_template(
+                messages, tokenize=True,
+                add_generation_prompt=True,
+            )
+            answer: int  = tokenizer.encode(
+                "Answer: " + sample["label"],
+                add_special_tokens=False
+            )[-1]
                      
         sample = {
             "input_ids": prompt,
