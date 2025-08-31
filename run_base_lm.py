@@ -69,7 +69,7 @@ def get_llm_engine(args) -> Tuple:
         enforce_eager=args.enforce_eager,
         max_model_len=args.max_model_len,
         gpu_memory_utilization=args.gpu_memory_utilization,
-        enable_lora=True,
+        enable_lora=True if args.lora_path is not None else False
     )
     return sampling_params, llm
 
