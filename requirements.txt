@@ -8,7 +8,7 @@ black[jupyter]
 datasets
 fire
 peft
-transformers==4.48.2
+transformers==4.55.2
 sentencepiece
 py7zr
 scipy==1.13.0
@@ -30,6 +30,5 @@ pandas==2.2.3
 tiktoken==0.8.0
 scikit-learn==1.4.2
 pyreadstat==1.1.2
-vllm==0.7.2
 wandb==0.19.6
-ipykernel
+vllm==0.10.1.1

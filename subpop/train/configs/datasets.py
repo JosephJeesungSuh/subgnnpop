@@ -42,17 +42,9 @@ class llamaguard_toxicchat_dataset:
 
 
 @dataclass
-class opnqa_steering_dataset:
-    dataset: str = "opnqa_steering_dataset"
+class individual:
+    dataset: str = "individual"
     file: str = "subpop/train/datasets/opinionqa_dataset.py:get_preprocessed_opinionqa_ce_or_wd_loss"
-    train_split: str = "subpop/train/datasets/{dataset_path}/opnqa_500_{steering_type}_train.csv"
-    valid_split: str = "subpop/train/datasets/{dataset_path}/opnqa_500_{steering_type}_val.csv"
-    test_split:  str = "subpop/train/datasets/{dataset_path}/opnqa_500_{steering_type}_test.csv"
-
-@dataclass
-class opnqa_single_demographic_dataset:
-    dataset: str = "opnqa_single_demographic_dataset"
-    file: str = "subpop/train/datasets/opinionqa_dataset.py:get_preprocessed_opinionqa_ce_or_wd_loss"
-    train_split: str = "subpop/train/datasets/{dataset_path}/opnqa_500_{attribute}_{group}_{steering_type}_train.csv"
-    valid_split: str = "subpop/train/datasets/{dataset_path}/opnqa_500_{attribute}_{group}_{steering_type}_val.csv"
-    test_split:  str = "subpop/train/datasets/{dataset_path}/opnqa_500_{attribute}_{group}_{steering_type}_test.csv"
+    train_split: str = "subpop/train/datasets/{dataset_path}_train.jsonl"
+    valid_split: str = "subpop/train/datasets/{dataset_path}_val.jsonl"
+    test_split:  str = "subpop/train/datasets/{dataset_path}_test.jsonl"

@@ -72,20 +72,11 @@ def generate_dataset_config(train_config, kwargs):
 
     update_config(dataset_config, **kwargs)
 
-    if dataset_config.dataset == 'opnqa_steering_dataset':
+    if dataset_config.dataset == 'individual':
         dataset_path = train_config.dataset_path
-        steering_type = train_config.steering_type
-        dataset_config.train_split = dataset_config.train_split.format(dataset_path = dataset_path, steering_type = steering_type)
-        dataset_config.valid_split = dataset_config.valid_split.format(dataset_path = dataset_path, steering_type = steering_type)
-        dataset_config.test_split  = dataset_config.test_split.format(dataset_path = dataset_path, steering_type = steering_type)
-    elif dataset_config.dataset == 'opnqa_single_demographic_dataset':
-        dataset_path = train_config.dataset_path
-        attribute = train_config.attribute
-        group = train_config.group
-        steering_type = train_config.steering_type
-        dataset_config.train_split = dataset_config.train_split.format(dataset_path = dataset_path, attribute = attribute, group = group, steering_type = steering_type)
-        dataset_config.valid_split = dataset_config.valid_split.format(dataset_path = dataset_path, attribute = attribute, group = group, steering_type = steering_type)
-        dataset_config.test_split  = dataset_config.test_split.format(dataset_path = dataset_path, attribute = attribute, group = group, steering_type = steering_type)
+        dataset_config.train_split = dataset_config.train_split.format(dataset_path = dataset_path)
+        dataset_config.valid_split = dataset_config.valid_split.format(dataset_path = dataset_path)
+        dataset_config.test_split  = dataset_config.test_split.format(dataset_path = dataset_path)
     else:
         raise ValueError(f"Unknown dataset: {dataset_config.dataset}")
     
