@@ -1,4 +1,4 @@
-torch==2.5.1
+torch==2.7.1
 accelerate
 appdirs
 loralib
@@ -8,14 +8,14 @@ black[jupyter]
 datasets
 fire
 peft
-transformers==4.48.2
+transformers==4.55.2
 sentencepiece
 py7zr
 scipy==1.13.0
 optimum
 matplotlib==3.8.4
 chardet
-openai==1.59.8
+openai==1.102.0
 typing-extensions>=4.8.0
 tabulate
 evaluate
@@ -29,7 +29,6 @@ codeshield
 pandas==2.2.3
 tiktoken==0.8.0
 scikit-learn==1.4.2
-pyreadstat==1.1.2
-vllm==0.7.2
+vllm==0.10.1.1
 wandb==0.19.6
 ipykernel
