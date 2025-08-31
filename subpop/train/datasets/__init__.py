@@ -15,11 +15,9 @@ DATASET_PREPROC = {
     # "samsum_dataset": get_samsum_dataset,
     # "llamaguard_toxicchat_dataset": get_llamaguard_toxicchat_dataset,
     "custom_dataset": get_custom_dataset,
-    "opnqa_steering_dataset": get_custom_dataset,
-    "opnqa_single_demographic_dataset": get_custom_dataset,
+    "individual": get_custom_dataset,
 }
 DATALOADER_COLLATE_FUNC = {
     "custom_dataset": get_data_collator,
-    "opnqa_steering_dataset": custom_collator_no_labels,
-    "opnqa_single_demographic_dataset": custom_collator_no_labels,
+    "individual": custom_collator_no_labels,
 }

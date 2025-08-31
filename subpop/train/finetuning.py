@@ -147,7 +147,7 @@ def main(**kwargs):
     if train_config.use_wandb:
         if not train_config.enable_fsdp or rank==0:
             wandb_run = setup_wandb(train_config, fsdp_config, **kwargs)
-    
+
     #setting quantization configs
     bnb_config = None
     if train_config.quantization:
