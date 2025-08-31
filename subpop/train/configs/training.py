@@ -11,7 +11,7 @@ class train_config:
     enable_fsdp: bool=True # shards model parameters, optimizer states and gradients across DDP ranks
     low_cpu_fsdp: bool=True # saves cpu memory by loading pretrained model on rank0 only
     run_validation: bool=True # whether to run validation every epoch
-    run_test: bool=False # whether to run test when best validation loss is found
+    run_test: bool=True # whether to run test when best validation loss is found
     batch_size_training: int=32
     batching_strategy: str="padding"
     context_length: int=4096
