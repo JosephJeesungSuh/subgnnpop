@@ -1,4 +1,4 @@
-subpop/train/datasets/inductive_individual_zeroshot
+subpop/train/datasets/inductive_individual_zeroshot/*
 outputs/
 ## SubPOP-train
 # raw data file from American Trends Panel
