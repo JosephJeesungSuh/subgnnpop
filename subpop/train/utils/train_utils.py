@@ -605,7 +605,7 @@ def evaluation(model,train_config, eval_dataloader, local_rank, tokenizer, wandb
                         f'{mode}/loss': eval_epoch_loss,
                         f'{mode}/kl_loss': eval_epoch_kl_loss,
                         f'{mode}/indiv_acc': eval_epoch_indiv_acc,
-                    }, commit=False)
+                    })
 
     return eval_ppl, eval_epoch_loss, val_step_loss, val_step_perplexity
 
