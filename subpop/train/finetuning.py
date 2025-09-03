@@ -26,10 +26,14 @@ from transformers import (
     AutoProcessor, 
     LlamaForCausalLM,
     MistralForCausalLM, # mistral support (custom)
+    Qwen2ForCausalLM, 
+    Qwen3ForCausalLM,
     MllamaForConditionalGeneration,
 )
 from transformers.models.llama.modeling_llama import LlamaDecoderLayer
 from transformers.models.mistral.modeling_mistral import MistralDecoderLayer # mistral support (custom)
+from transformers.models.qwen2.modeling_qwen2 import Qwen2DecoderLayer
+from transformers.models.qwen3.modeling_qwen3 import Qwen3DecoderLayer
 from transformers.models.mllama.modeling_mllama import  MllamaSelfAttentionDecoderLayer,MllamaCrossAttentionDecoderLayer,MllamaVisionEncoderLayer
 
 from subpop.train.configs import fsdp_config as FSDP_CONFIG
@@ -228,6 +232,54 @@ def main(**kwargs):
                 device_map="auto" if train_config.quantization and not train_config.enable_fsdp else None,
                 torch_dtype=torch.float16 if train_config.use_fp16 else torch.bfloat16,
             )
+    elif config.model_type == "qwen3":  # qwen3 support (custom)
+        is_vision = False
+        if train_config.enable_fsdp and train_config.low_cpu_fsdp:
+            if rank == 0:
+                model = Qwen3ForCausalLM.from_pretrained(
+                    train_config.model_name,
+                    quantization_config=bnb_config,
+                    attn_implementation="sdpa" if train_config.use_fast_kernels else None,
+                    device_map="auto" if train_config.quantization and not train_config.enable_fsdp else None,
+                    torch_dtype=torch.float16 if train_config.use_fp16 else torch.bfloat16,
+                )
+            else:
+                qwen_cfg = AutoConfig.from_pretrained(train_config.model_name)
+                qwen_cfg.use_cache = use_cache
+                with torch.device("meta"):
+                    model = Qwen3ForCausalLM(qwen_cfg)
+        else:
+            model = Qwen3ForCausalLM.from_pretrained(
+                train_config.model_name,
+                quantization_config=bnb_config,
+                attn_implementation="sdpa" if train_config.use_fast_kernels else None,
+                device_map="auto" if train_config.quantization and not train_config.enable_fsdp else None,
+                torch_dtype=torch.float16 if train_config.use_fp16 else torch.bfloat16,
+            )
+    elif config.model_type == "qwen2":  # optional: qwen2 support
+        is_vision = False
+        if train_config.enable_fsdp and train_config.low_cpu_fsdp:
+            if rank == 0:
+                model = Qwen2ForCausalLM.from_pretrained(
+                    train_config.model_name,
+                    quantization_config=bnb_config,
+                    attn_implementation="sdpa" if train_config.use_fast_kernels else None,
+                    device_map="auto" if train_config.quantization and not train_config.enable_fsdp else None,
+                    torch_dtype=torch.float16 if train_config.use_fp16 else torch.bfloat16,
+                )
+            else:
+                qwen2_cfg = AutoConfig.from_pretrained(train_config.model_name)
+                qwen2_cfg.use_cache = use_cache
+                with torch.device("meta"):
+                    model = Qwen2ForCausalLM(qwen2_cfg)
+        else:
+            model = Qwen2ForCausalLM.from_pretrained(
+                train_config.model_name,
+                quantization_config=bnb_config,
+                attn_implementation="sdpa" if train_config.use_fast_kernels else None,
+                device_map="auto" if train_config.quantization and not train_config.enable_fsdp else None,
+                torch_dtype=torch.float16 if train_config.use_fp16 else torch.bfloat16,
+            )
     else:
         raise ValueError(f"Model type {config.model_type} is not supported. Please use llama or mllama model.")
     # Load the tokenizer and add special tokens
@@ -284,6 +336,10 @@ def main(**kwargs):
         # Create the FSDP wrapper for LlamaDecoderLayer in text models
             if config.model_type == "mistral": # mistral support (custom)
                 my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, [MistralDecoderLayer])
+            elif config.model_type == "qwen3":
+                my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, [Qwen3DecoderLayer])
+            elif config.model_type == "qwen2":
+                my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, [Qwen2DecoderLayer])
             else:
                 my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, [LlamaDecoderLayer])
         device_id = 0
