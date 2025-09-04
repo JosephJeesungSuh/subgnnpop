@@ -44,6 +44,15 @@ def get_preprocessed_opinionqa_ce_or_wd_loss(
     dataset_config, tokenizer, split, chat_template, save = True,
 ):
     
+    tokenizer.padding_side = "left"
+
+    def _is_gpt_oss(tok):
+        # Robust detection: either model path says gpt-oss, or the template includes Harmony tags.
+        name = (getattr(tok, "name_or_path", "") or "").lower()
+        tmpl = getattr(tok, "chat_template", "") or ""
+        return ("gpt-oss" in name) or ("<|start|>" in tmpl and "<|channel|>" in tmpl and "<|message|>" in tmpl)
+    _uses_harmony = _is_gpt_oss(tokenizer)
+    
     chat_template = True if chat_template.lower() == 'true' else False
     print(f"--> is_chat_template: {chat_template}")
 
@@ -64,11 +73,18 @@ def get_preprocessed_opinionqa_ce_or_wd_loss(
                 messages, tokenize=True,
                 add_generation_prompt=True,
             )
-            answer: int  = tokenizer.encode(
-                "Answer: " + sample["label"],
-                add_special_tokens=False
-            )[-1]
-                     
+            if _uses_harmony:
+                assistant_header = tokenizer.encode("<|channel|>final<|message|>", add_special_tokens=False)
+                prompt = prompt + assistant_header
+                answer: int = tokenizer.encode(
+                    sample["label"], add_special_tokens=False
+                )[0]
+            else:
+                answer: int = tokenizer.encode(
+                    "Answer: " + sample["label"],
+                    add_special_tokens=False
+                )[-1]
+
         sample = {
             "input_ids": prompt,
             "attention_mask" : [1] * len(prompt),

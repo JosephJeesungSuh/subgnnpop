@@ -28,12 +28,14 @@ from transformers import (
     MistralForCausalLM, # mistral support (custom)
     Qwen2ForCausalLM, 
     Qwen3ForCausalLM,
+    GptOssForCausalLM,
     MllamaForConditionalGeneration,
 )
 from transformers.models.llama.modeling_llama import LlamaDecoderLayer
 from transformers.models.mistral.modeling_mistral import MistralDecoderLayer # mistral support (custom)
 from transformers.models.qwen2.modeling_qwen2 import Qwen2DecoderLayer
 from transformers.models.qwen3.modeling_qwen3 import Qwen3DecoderLayer
+from transformers.models.gpt_oss.modeling_gpt_oss import GptOssDecoderLayer
 from transformers.models.mllama.modeling_mllama import  MllamaSelfAttentionDecoderLayer,MllamaCrossAttentionDecoderLayer,MllamaVisionEncoderLayer
 
 from subpop.train.configs import fsdp_config as FSDP_CONFIG
@@ -280,6 +282,28 @@ def main(**kwargs):
                 device_map="auto" if train_config.quantization and not train_config.enable_fsdp else None,
                 torch_dtype=torch.float16 if train_config.use_fp16 else torch.bfloat16,
             )
+    elif config.model_type == "gpt_oss":  # gpt-oss support (custom)
+        is_vision = False
+        # Note: GPT-OSS weights ship with MXFP4 kernels via `kernels` package; we do NOT
+        # pass BitsAndBytes `quantization_config` here to avoid conflicts with MXFP4.
+        if train_config.enable_fsdp and train_config.low_cpu_fsdp:
+            if rank == 0:
+                model = GptOssForCausalLM.from_pretrained(
+                    train_config.model_name,
+                    device_map="auto" if train_config.quantization and not train_config.enable_fsdp else None,
+                    torch_dtype=torch.float16 if train_config.use_fp16 else torch.bfloat16,
+                )
+            else:
+                gptoss_cfg = AutoConfig.from_pretrained(train_config.model_name)
+                gptoss_cfg.use_cache = use_cache
+                with torch.device("meta"):
+                    model = GptOssForCausalLM(gptoss_cfg)
+        else:
+            model = GptOssForCausalLM.from_pretrained(
+                train_config.model_name,
+                device_map="auto" if train_config.quantization and not train_config.enable_fsdp else None,
+                torch_dtype=torch.float16 if train_config.use_fp16 else torch.bfloat16,
+            )
     else:
         raise ValueError(f"Model type {config.model_type} is not supported. Please use llama or mllama model.")
     # Load the tokenizer and add special tokens
@@ -340,6 +364,8 @@ def main(**kwargs):
                 my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, [Qwen3DecoderLayer])
             elif config.model_type == "qwen2":
                 my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, [Qwen2DecoderLayer])
+            elif config.model_type == "gpt_oss":
+                my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, [GptOssDecoderLayer])
             else:
                 my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, [LlamaDecoderLayer])
         device_id = 0
