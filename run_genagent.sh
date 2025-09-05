@@ -6,11 +6,11 @@ OUTPUT_ROOT="/nas/ucb/jjssuh/old_projs/subpop/outputs"
 INPUT_ROOT="/nas/ucb/jjssuh/old_projs/subpop/subpop/train/datasets"
 
 declare -A TASKS
-TASKS["inductive_zeroshot"]="inductive_individual_zeroshot/task1_zeroshot_opinionqa_0.875_test.jsonl"
-# TASKS["inductive_fewshot_3"]="inductive_individual_fewshot_3/opinionqa_0.2_val.jsonl"
-# TASKS["inductive_fewshot_5"]="inductive_individual_fewshot_5/opinionqa_0.2_val.jsonl"
-# TASKS["inductive_fewshot_8"]="inductive_individual_fewshot_8/opinionqa_0.2_val.jsonl"
-# TASKS["inductive_fewshot_13"]="inductive_individual_fewshot_13/opinionqa_0.2_val.jsonl"
+# TASKS["inductive_zeroshot"]="inductive_individual_zeroshot/task1_zeroshot_opinionqa_0.875_test.jsonl"
+TASKS["inductive_fewshot_3"]="inductive_individual_fewshot_3/opinionqa_0.8_val.jsonl"
+TASKS["inductive_fewshot_5"]="inductive_individual_fewshot_5/opinionqa_0.8_val.jsonl"
+TASKS["inductive_fewshot_8"]="inductive_individual_fewshot_8/opinionqa_0.8_val.jsonl"
+TASKS["inductive_fewshot_13"]="inductive_individual_fewshot_13/opinionqa_0.8_val.jsonl"
 
 MODELS=(
   "meta-llama/Llama-2-7b-chat-hf"

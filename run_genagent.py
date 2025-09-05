@@ -209,11 +209,14 @@ def run_survey(args, sampling_params, llm, lora_idx, base_model_name_or_path) ->
         genagent_outputs.append(out_str)
         match = re.search(r"\{.*\}", out_str.lower(), re.DOTALL)
         if match:
-            json_str = match.group(0)
-            _data = json.loads(json_str)
-            correct = (target_label[idx].lower() == _data['response'].strip())
-            correct_cnts += int(correct)
-            all_cnts += 1
+            try:
+                json_str = match.group(0)
+                _data = json.loads(json_str)
+                correct = (target_label[idx].lower() == _data['response'].strip())
+                correct_cnts += int(correct)
+                all_cnts += 1
+            except json.JSONDecodeError:
+                pass
 
     print(f"--> gen_agent_framework: accuracy = {correct_cnts}/{len(lines)} = {correct_cnts/len(lines):.4f}") 
     print(f"--> accuracy over valid runs: {correct_cnts}/{all_cnts} = {correct_cnts/all_cnts:.4f}")
