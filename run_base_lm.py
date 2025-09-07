@@ -108,10 +108,18 @@ def inference_offline(args, data_list_test, sampling_params, llm, lora_idx):
         else:
             outputs = llm.generate(prompts, sampling_params, lora_request=lora_request)
     else:
-        if args.is_chat:
-            outputs = llm.chat(prompts, sampling_params)
-        else:
+        if llm.llm_engine.model_config.model == "openai/gpt-oss-20b":
+            prompts = [
+                tokenizer.apply_chat_template(
+                    prompt, tokenize=False, add_generation_prompt=True, add_special_tokens=False
+                ) + "<|channel|>final<|message|>" for prompt in prompts
+            ]
             outputs = llm.generate(prompts, sampling_params)
+        else:
+            if args.is_chat:
+                outputs = llm.chat(prompts, sampling_params)
+            else:
+                outputs = llm.generate(prompts, sampling_params)
 
     # extract logprobs and calculate the probability per option
     results = []
