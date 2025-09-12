@@ -17,6 +17,7 @@ from vllm import LLM, SamplingParams
 from vllm.lora.request import LoRARequest
 
 from subpop.utils.survey_utils import ordinal_emd, list_normalize
+from subpop.utils.logger import start_capture
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parents[2]
 warnings.filterwarnings("ignore")
@@ -59,7 +60,7 @@ def get_llm_engine(args) -> Tuple:
     Load the LLM engine on a local machine and define sampling parameters.
     """
     sampling_params = SamplingParams(
-        max_tokens=2048,
+        max_tokens=args.max_model_len * 3 // 4,
         temperature=0.0,
     )
     llm = LLM(
@@ -161,7 +162,7 @@ def run_survey(args, sampling_params, llm, lora_idx, base_model_name_or_path) ->
     with open(args.input_paths[lora_idx], "r", encoding="utf-8") as f:
         print(f"--> run_survey: input path = {args.input_paths[lora_idx]}")
         lines = f.readlines()
-    lines = [ast.literal_eval(line) for line in lines]
+    lines = [ast.literal_eval(line) for line in lines][:2000] # maximum 2000 samples
 
     expert_input = []
     participant_info = []
@@ -252,6 +253,7 @@ def cli_args_parser():
     parser.add_argument("--lora_path", type=str, nargs="+", default=None)
     parser.add_argument("--lora_name", type=str, nargs="+", default=None)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.8)
+    parser.add_argument("--use_logger", action="store_true")
 
     # debug flag is provided for better understanding of intermediate artifacts.
     parser.add_argument("--debug", action="store_true")
@@ -279,6 +281,13 @@ if __name__ == "__main__":
     """
 
     args = cli_args_parser()
+
+    if args.use_logger:
+        curr_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        _ = start_capture(
+            debug=True,
+            save_path=f"/nas/ucb/jjssuh/slurm_output_pool/genagent_{curr_datetime}.log"
+        )
 
     # check argument consistency
     assert args.input_paths is not None, "Input paths should be provided."

@@ -1,24 +1,58 @@
+import sys
+import os
 import logging
 import pathlib
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import Union
 
+def start_capture(
+    debug: bool,
+    save_path: Union[str, pathlib.Path],
+):
+    if isinstance(save_path, str):
+        save_path = pathlib.Path(save_path)
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+    save_path = save_path.with_suffix(".log")
 
-def get_logger_top(name: str, debug: bool):
+    logger = logging.getLogger("stdout_logger")
+    logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    fmt = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+
+    fh = logging.FileHandler(save_path)
+    fh.setFormatter(fmt)
+    logger.addHandler(fh)
+
+    class LoggerWriter:
+        def __init__(self, level):
+            self.level = level
+            self._buffer = ""
+
+        def write(self, message):
+            self._buffer += message
+            while "\n" in self._buffer:
+                line, self._buffer = self._buffer.split("\n", 1)
+                if line:
+                    logger.log(self.level, line)
+
+        def flush(self):
+            if self._buffer:
+                logger.log(self.level, self._buffer)
+                self._buffer = ""
+        
+        def isatty(self):
+            return False
+
+    sys.stdout = LoggerWriter(logging.INFO)
+    sys.stderr = LoggerWriter(logging.ERROR)
+    return logger
+
+if __name__ == "__main__":
+    
     REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 
-    initial_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    # set up save path
-    save_path = (
-        REPO_ROOT / "results" / "logs" / f"experiment_{name.lower()}_{initial_time}.log"
+    logger = start_capture(
+        debug=True,
+        save_path = REPO_ROOT / "outputs" / "test_log.log",
     )
-    save_path.parent.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(
-        level=logging.DEBUG if debug else logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.FileHandler(save_path),
-            logging.StreamHandler(),
-        ],
-    )
-
-    return logging.getLogger(name)
+    print("This is a test message.")
+    print("This is an error message.", file=sys.stderr)

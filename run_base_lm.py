@@ -17,6 +17,7 @@ from vllm import LLM, SamplingParams
 from vllm.lora.request import LoRARequest
 
 from subpop.utils.survey_utils import ordinal_emd, list_normalize
+from subpop.utils.logger import start_capture
 
 ROOT_DIR = pathlib.Path(__file__).resolve().parents[2]
 warnings.filterwarnings("ignore")
@@ -120,9 +121,11 @@ def inference_offline(args, data_list_test, sampling_params, llm, lora_idx):
                 outputs = llm.chat(prompts, sampling_params)
             else:
                 outputs = llm.generate(prompts, sampling_params)
+    del llm
 
     # extract logprobs and calculate the probability per option
     results = []
+    sum_probs = []
     total_samples, correct_samples = len(data_list_test), 0
     for idx, output in enumerate(outputs):
         logprobs = output.outputs[0].logprobs[0]
@@ -135,6 +138,7 @@ def inference_offline(args, data_list_test, sampling_params, llm, lora_idx):
             prob_2 = np.exp(logprob_2.logprob) if logprob_2 is not None else 0
             prob_per_option.append(prob_1 + prob_2)
         max_idx = np.argmax(prob_per_option)
+        sum_probs.append(sum(prob_per_option))
         is_correct = False
         if targets[idx] == chr(ord("A") + max_idx):
             correct_samples += 1
@@ -148,6 +152,7 @@ def inference_offline(args, data_list_test, sampling_params, llm, lora_idx):
             )
         )
     print(f"--> inference_offline: accuracy = {correct_samples}/{total_samples} = {correct_samples/total_samples:.4f}")
+    print(f"--> inference_offline: probability mass sum average: {np.mean(sum_probs):.4f} +/- {np.std(sum_probs):.4f}")
     return results, (
         args.lora_name[lora_idx]
         if args.lora_name is not None
@@ -206,10 +211,11 @@ def cli_args_parser():
     parser.add_argument("--max_logprobs", type=int, default=256)
     parser.add_argument("--enable_prefix_caching", type=bool, default=False)
     parser.add_argument("--enforce_eager", type=bool, default=True)
-    parser.add_argument("--max_model_len", type=int, default=2048)
+    parser.add_argument("--max_model_len", type=int, default=4096)
     parser.add_argument("--lora_path", type=str, nargs="+", default=None)
     parser.add_argument("--lora_name", type=str, nargs="+", default=None)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.8)
+    parser.add_argument("--use_logger", action="store_true")
 
     # debug flag is provided for better understanding of intermediate artifacts.
     parser.add_argument("--debug", action="store_true")
@@ -237,6 +243,13 @@ if __name__ == "__main__":
     """
 
     args = cli_args_parser()
+
+    if args.use_logger:
+        curr_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        _ = start_capture(
+            debug=True,
+            save_path=f"/nas/ucb/jjssuh/slurm_output_pool/baselm_{curr_datetime}.log"
+        )
 
     # check argument consistency
     assert args.input_paths is not None, "Input paths should be provided."
