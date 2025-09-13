@@ -1,6 +1,7 @@
 import argparse
 import ast
 import datetime
+from pyexpat.errors import messages
 import re
 import json
 import pathlib
@@ -116,6 +117,13 @@ def inference_offline(args, data_list_test, sampling_params, llm, lora_idx):
                 ) + "<|channel|>final<|message|>" for prompt in prompts
             ]
             outputs = llm.generate(prompts, sampling_params)
+        elif llm.llm_engine.model_config.model.startswith("Qwen/Qwen3"):
+            prompts = [
+                tokenizer.apply_chat_template(
+                    prompt, tokenize=False, add_generation_prompt=True, enable_thinking=False
+                ) for prompt in prompts
+            ]
+            outputs = llm.generate(prompts, sampling_params)
         else:
             if args.is_chat:
                 outputs = llm.chat(prompts, sampling_params)
@@ -174,7 +182,7 @@ def run_survey(args, sampling_params, llm, lora_idx) -> None:
     with open(args.input_paths[lora_idx], "r", encoding="utf-8") as f:
         print(f"--> run_survey: input path = {args.input_paths[lora_idx]}")
         lines = f.readlines()
-    lines = [ast.literal_eval(line) for line in lines]
+    lines = [ast.literal_eval(line) for line in lines][:2000] # maximum 2000 samples
     
     results, model_name = inference_offline(
         args, lines, sampling_params, llm, lora_idx
