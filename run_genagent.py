@@ -213,7 +213,7 @@ def run_survey(args, sampling_params, llm, lora_idx, base_model_name_or_path) ->
             try:
                 json_str = match.group(0)
                 _data = json.loads(json_str)
-                correct = (target_label[idx].lower() == _data['response'].strip())
+                correct = (target_label[idx].lower() == _data.get('response', '').strip())
                 correct_cnts += int(correct)
                 all_cnts += 1
             except json.JSONDecodeError:
@@ -249,7 +249,7 @@ def cli_args_parser():
     parser.add_argument("--max_logprobs", type=int, default=256)
     parser.add_argument("--enable_prefix_caching", type=bool, default=False)
     parser.add_argument("--enforce_eager", type=bool, default=True)
-    parser.add_argument("--max_model_len", type=int, default=8192)
+    parser.add_argument("--max_model_len", type=int, default=4096)
     parser.add_argument("--lora_path", type=str, nargs="+", default=None)
     parser.add_argument("--lora_name", type=str, nargs="+", default=None)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.8)
